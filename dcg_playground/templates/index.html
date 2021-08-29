@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>datamodel-code-generator | Playground</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/vs.min.css" rel="stylesheet">
+
+  <style>
+    .buttons {
+      margin-left: auto;
+      margin-right: 5%;
+    }
+
+    textarea {
+      outline: none;
+      width: 100%;
+      height: 100%;
+      resize: none;
+      border: 0;
+    }
+
+    .flex-equal > * {
+      flex: 1;
+    }
+    @media (min-width: 768px) {
+      .flex-md-equal > * {
+        flex: 1;
+      }
+    }
+
+    .data-container {
+      height: calc(100vh - 72px);
+    }
+
+    .data-container > div:last-child {
+      height: calc(100% - 2.5rem - 1em);
+    }
+
+  </style>
+</head>
+  <body>
+    <header>
+      <div class="collapse bg-dark" id="navbarHeader">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-8 col-md-7 py-4">
+              <h4 class="text-white">About</h4>
+              <p class="text-muted">
+                This code generator creates pydantic model from an openapi file and others.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container">
+          <a href="/" class="navbar-brand d-flex align-items-center">
+            <strong>datamodel-code-generator</strong>
+          </a>
+          <div class="col-auto text-end buttons">
+            <a href="https://koxudaxi.github.io/datamodel-code-generator/" class="btn btn-outline-light me-3" target="_blank">
+              Documentation
+            </a>
+            <a href="https://github.com/koxudaxi/datamodel-code-generator" class="btn btn-outline-light me-2" target="_blank">
+              Github
+            </a>
+            <a href="https://github.com/boardpack/dcg-playground" class="btn btn-outline-light me-2" target="_blank">
+              Playgroud Github
+            </a>
+          </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3">
+        <div class="data-container bg-dark me-md-3 px-3 text-center text-white">
+          <div>
+            <h2 class="display-6">OpenAPI 3</h2>
+          </div>
+          <div class="bg-light shadow-sm mx-auto">
+            <textarea id="source"></textarea>
+          </div>
+        </div>
+        <div class="data-container bg-light me-md-3 px-3 overflow-auto">
+          <div>
+            <h2 class="display-6 text-center">Pydantic models</h2>
+          </div>
+          <div class="bg-light shadow-sm mx-auto">
+            <pre><code id="output" class="language-python"></code></pre>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="text-muted py-5">
+      <div class="container">
+        <p class="float-end mb-1">
+          <a href="#">Back to top</a>
+        </p>
+        <p class="mb-1">© 2021 Boardpack</p>
+        <p class="mb-0">
+          This code generator creates pydantic model from an openapi file and others. <br>
+          Here you can check a datamodel-code-generator output.
+        </p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+
+    <script>
+      const debounce = (function createDebounce() {
+        let timeout = null;
+        return function (fnc, delayMs) {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            fnc();
+          }, delayMs || 500);
+        };
+      })();
+
+      const source = document.getElementById("source");
+      source.addEventListener("input", (() => {
+        let output;
+
+        debounce(async () => {
+          try {
+            const { data } = await axios.post("/generate", {
+              source: source.value,
+            });
+            output = data.output;
+          } catch (e) {
+            output = e.response.data.output;
+          }
+
+          debugger;
+          document.getElementById("output").innerHTML = output;
+          hljs.highlightAll();
+        });
+      }));
+    </script>
+  </body>
+</html>
